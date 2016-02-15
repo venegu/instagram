@@ -8,10 +8,17 @@
 
 import UIKit
 
-class PhotoViewController: UIViewController {
+class PhotoViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    @IBOutlet weak var instagramTableView: UITableView!
+    
+    var instaData: NSDictionary?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        instagramTableView.dataSource = self
+        instagramTableView.delegate = self
         
         let clientId = "e05c462ebd86446ea48a5af73769b602"
         let url = NSURL(string:"https://api.instagram.com/v1/media/popular?client_id=\(clientId)")
@@ -27,7 +34,10 @@ class PhotoViewController: UIViewController {
                 if let data = dataOrNil {
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
-                            NSLog("response: \(responseDictionary)")
+                            //NSLog("response: \(responseDictionary)")
+                            self.instaData = (responseDictionary)
+                            print(self.instaData!["data"]![0])
+                            
                     }
                 }
         });
@@ -40,6 +50,29 @@ class PhotoViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
+       if let instaData = instaData {
+            return instaData.count
+            
+        } else {
+            return 0
+        }
+        
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("InstagramCell", forIndexPath: indexPath) as! InstagramCell
+        cell.textLabel?.text = "row: \(indexPath.row)"
+        print("row \(indexPath.row)")
+        
+//        let username = instaData[""] as! String
+        
+    //      cell.usernameLabel.text = username
+        
+        return cell
+    }
+
     
 
     /*
